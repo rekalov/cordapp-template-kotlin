@@ -50,6 +50,9 @@ dependencies {
 
     // CorDapp dependencies.
     cordapp project(":contracts")
+    cordapp "com.r3.corda.lib.ci:ci-workflows:$confidentialIdVersion"
+    cordapp "com.r3.corda.lib.tokens:tokens-selection:$cordaTokenSdkVersion"
+    cordapp "com.r3.corda.lib.tokens:tokens-workflows:$cordaTokenSdkVersion"
 }
 
 task integrationTest(type: Test, dependsOn: []) {

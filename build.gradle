@@ -20,6 +20,9 @@ buildscript {
         //springboot
         spring_boot_version = '2.0.2.RELEASE'
         spring_boot_gradle_plugin_version = '2.0.2.RELEASE'
+
+        cordaTokenSdkVersion = '1.1'
+        confidentialIdVersion = '1.0'
     }
 
     repositories {
@@ -48,6 +51,7 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url 'https://software.r3.com/artifactory/corda' }
+        maven { url 'https://software.r3.com/artifactory/corda-lib' }
         maven { url 'https://jitpack.io' }
     }
 
