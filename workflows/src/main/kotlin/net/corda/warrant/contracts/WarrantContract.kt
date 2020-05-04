@@ -8,7 +8,7 @@ import net.corda.core.transactions.LedgerTransaction
 class WarrantContract : EvolvableTokenContract(), Contract {
     companion object {
         // Used to identify our contract when building a transaction.
-        const val ID = "net.corda.behave.tokensdk.contracts.WarrantContract"
+        const val ID = "net.corda.warrant.contracts.WarrantContract"
     }
 
     override fun additionalCreateChecks(tx: LedgerTransaction) {
