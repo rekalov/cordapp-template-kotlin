@@ -5,8 +5,11 @@ import net.corda.testing.node.TestCordapp
 class TestDefaults {
     companion object {
         private val cordappPackages = listOf(
-                "net.corda.behave.tokensdk.contracts",
-                "net.corda.behave.tokensdk.flows",
+                "net.corda.warrant.contracts",
+                "net.corda.warrant.flows",
+                "com.test",
+                "com.template.contracts",
+                "com.template.flows",
 
                 "com.r3.corda.lib.tokens.contracts",
                 "com.r3.corda.lib.tokens.workflows.flows",
