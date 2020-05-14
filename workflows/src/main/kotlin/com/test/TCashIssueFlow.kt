@@ -10,6 +10,7 @@ import net.corda.core.contracts.Amount
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
+import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.utilities.ProgressTracker
 import java.util.*
 
@@ -17,6 +18,9 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class TCashIssueFlow(private val amount: Amount<Currency>, val recipient: Party) : FlowLogic<SignedTransaction>() {
+    constructor(amount: Amount<Currency>, issueRef: OpaqueBytes, recipient: Party, anonymous: Boolean, notary: Party)
+            : this(amount, recipient)
+
     override val progressTracker = ProgressTracker(INITIALIZING, ISSUING_CASH_TOKEN)
 
     private fun Amount<Currency>.tokenize(): Amount<TokenType> =
