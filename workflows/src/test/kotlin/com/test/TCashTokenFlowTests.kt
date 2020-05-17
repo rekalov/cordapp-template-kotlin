@@ -55,7 +55,7 @@ class TCashTokenFlowTests {
     }
 
     @Test
-    fun testRedeemTokensGeneratedByUs() {
+    fun testRedeemTokensIssuedByYourself() {
         val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
         val future2 = a.startFlow(TCashIssueTokenFlow(10.DOLLARS, a.info.singleIdentity()))
         network.runNetwork()
@@ -69,16 +69,50 @@ class TCashTokenFlowTests {
     }
 
     @Test
-    fun testRedeemTokensGeneratedByCounterpart() {
-        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, b.info.singleIdentity()))
-        val future2 = a.startFlow(TCashIssueTokenFlow(10.DOLLARS, b.info.singleIdentity()))
+    fun testRedeemTokensIssuedByCounterpart() {
+        val future = b.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        val future2 = b.startFlow(TCashIssueTokenFlow(10.DOLLARS, a.info.singleIdentity()))
         network.runNetwork()
         future.get()
         future2.get()
-        val future3 = b.startFlow(TCashRedeemTokenFlow(30.DOLLARS, a.info.singleIdentity()))
+        val future3 = a.startFlow(TCashRedeemTokenFlow(30.DOLLARS, b.info.singleIdentity()))
         network.runNetwork()
         future3.get()
-        val tokens = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
         assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
+        val tokens2 = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(0, tokens2.sumByLong { it.state.data.amount.quantity })
+    }
+
+    @Test
+    fun testMoveTokensIssuedByYourself() {
+        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        val future2 = a.startFlow(TCashIssueTokenFlow(10.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future.get()
+        future2.get()
+        val future3 = a.startFlow(TCashPaymentTokenFlow(30.DOLLARS, b.info.singleIdentity()))
+        network.runNetwork()
+        future3.get()
+        val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
+        val tokens2 = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(30 * (10.0.pow(USD.fractionDigits)).toLong(), tokens2.sumByLong { it.state.data.amount.quantity })
+    }
+
+    @Test
+    fun testMoveTokensIssuedByCounterpart() {
+        val future = b.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        val future2 = b.startFlow(TCashIssueTokenFlow(10.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future.get()
+        future2.get()
+        val future3 = a.startFlow(TCashPaymentTokenFlow(30.DOLLARS, b.info.singleIdentity()))
+        network.runNetwork()
+        future3.get()
+        val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
+        val tokens2 = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(30 * (10.0.pow(USD.fractionDigits)).toLong(), tokens2.sumByLong { it.state.data.amount.quantity })
     }
 }
