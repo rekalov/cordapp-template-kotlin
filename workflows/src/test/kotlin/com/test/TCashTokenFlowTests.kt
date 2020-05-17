@@ -57,11 +57,13 @@ class TCashTokenFlowTests {
     @Test
     fun testRedeemTokensGeneratedByUs() {
         val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        val future2 = a.startFlow(TCashIssueTokenFlow(10.DOLLARS, a.info.singleIdentity()))
         network.runNetwork()
         future.get()
-        val future2 = a.startFlow(TCashRedeemTokenFlow(20.DOLLARS, a.info.singleIdentity()))
-        network.runNetwork()
         future2.get()
+        val future3 = a.startFlow(TCashRedeemTokenFlow(30.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future3.get()
         val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
         assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
     }
@@ -69,11 +71,13 @@ class TCashTokenFlowTests {
     @Test
     fun testRedeemTokensGeneratedByCounterpart() {
         val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, b.info.singleIdentity()))
+        val future2 = a.startFlow(TCashIssueTokenFlow(10.DOLLARS, b.info.singleIdentity()))
         network.runNetwork()
         future.get()
-        val future2 = b.startFlow(TCashRedeemTokenFlow(20.DOLLARS, a.info.singleIdentity()))
-        network.runNetwork()
         future2.get()
+        val future3 = b.startFlow(TCashRedeemTokenFlow(30.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future3.get()
         val tokens = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
         assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
     }
