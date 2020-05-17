@@ -27,6 +27,8 @@ class TCashTokenFlowTests {
     init {
         listOf(a, b).forEach {
             it.registerInitiatedFlow(TCashIssueTokenFlow.Responder::class.java)
+            it.registerInitiatedFlow(TCashPaymentTokenFlow.Responder::class.java)
+            it.registerInitiatedFlow(TCashRedeemTokenFlow.Responder::class.java)
         }
     }
 
