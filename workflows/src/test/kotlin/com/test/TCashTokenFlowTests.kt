@@ -17,7 +17,7 @@ import org.junit.Test
 import kotlin.math.pow
 import kotlin.test.assertEquals
 
-class TCashIssueFlowTests {
+class TCashTokenFlowTests {
     private val network = MockNetwork(MockNetworkParameters(
             cordappsForAllNodes = TestDefaults.allCordapps,
             networkParameters = testNetworkParameters(minimumPlatformVersion = 4)))
@@ -26,7 +26,7 @@ class TCashIssueFlowTests {
 
     init {
         listOf(a, b).forEach {
-            it.registerInitiatedFlow(TCashIssueFlow.Responder::class.java)
+            it.registerInitiatedFlow(TCashIssueTokenFlow.Responder::class.java)
         }
     }
 
@@ -38,7 +38,7 @@ class TCashIssueFlowTests {
 
     @Test
     fun testIssueToCounterpart() {
-        val future = a.startFlow(TCashIssueFlow(20.DOLLARS, b.info.singleIdentity()))
+        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, b.info.singleIdentity()))
         network.runNetwork()
         future.get()
         val tokens = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
@@ -47,10 +47,34 @@ class TCashIssueFlowTests {
 
     @Test
     fun testIssueToYourself() {
-        val future = a.startFlow(TCashIssueFlow(20.DOLLARS, a.info.singleIdentity()))
+        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
         network.runNetwork()
         future.get()
         val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
         assertEquals(20 * (10.0.pow(USD.fractionDigits)).toLong(), tokens.sumByLong { it.state.data.amount.quantity })
+    }
+
+    @Test
+    fun testRedeemTokensGeneratedByUs() {
+        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future.get()
+        val future2 = a.startFlow(TCashRedeemTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future2.get()
+        val tokens = a.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
+    }
+
+    @Test
+    fun testRedeemTokensGeneratedByCounterpart() {
+        val future = a.startFlow(TCashIssueTokenFlow(20.DOLLARS, b.info.singleIdentity()))
+        network.runNetwork()
+        future.get()
+        val future2 = b.startFlow(TCashRedeemTokenFlow(20.DOLLARS, a.info.singleIdentity()))
+        network.runNetwork()
+        future2.get()
+        val tokens = b.services.vaultService.queryBy<FungibleToken>(tokenAmountCriteria(USD)).states
+        assertEquals(0, tokens.sumByLong { it.state.data.amount.quantity })
     }
 }

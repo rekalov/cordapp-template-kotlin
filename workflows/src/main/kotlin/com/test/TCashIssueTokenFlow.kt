@@ -17,40 +17,41 @@ import java.util.*
 
 @InitiatingFlow
 @StartableByRPC
-class TCashIssueFlow(private val amount: Amount<Currency>, val recipient: Party) : FlowLogic<SignedTransaction>() {
+class TCashIssueTokenFlow(private val amount: Amount<Currency>, private val recipient: Party) : FlowLogic<SignedTransaction>() {
+    @Suppress("UNUSED", "UNUSED_PARAMETER")
     constructor(amount: Amount<Currency>, issueRef: OpaqueBytes, recipient: Party, anonymous: Boolean, notary: Party)
             : this(amount, recipient)
 
-    override val progressTracker = ProgressTracker(INITIALIZING, ISSUING_CASH_TOKEN)
+    override val progressTracker = ProgressTracker(INITIALIZING, ISSUING)
 
     private fun Amount<Currency>.tokenize(): Amount<TokenType> =
             Amount(quantity, displayTokenSize, TokenType(token.currencyCode, token.defaultFractionDigits))
 
     @Suspendable
     override fun call(): SignedTransaction {
-        logger.info("TCashIssueFlow start")
+        logger.info("${javaClass.name} start")
         progressTracker.currentStep = INITIALIZING
         val token = amount.tokenize() issuedBy ourIdentity heldBy recipient
         val session = initiateFlow(recipient)
 
-        progressTracker.currentStep = ISSUING_CASH_TOKEN
+        progressTracker.currentStep = ISSUING
         val ret = subFlow(ConfidentialIssueTokensFlow(listOf(token), listOf(session)))
-        logger.info("TCashIssueFlow finish")
+        logger.info("${javaClass.name} finish")
         return ret
     }
 
-    @InitiatedBy(TCashIssueFlow::class)
+    @InitiatedBy(TCashIssueTokenFlow::class)
     class Responder(private val counterpartySession: FlowSession) : FlowLogic<Unit>() {
         @Suspendable
         override fun call() {
-            logger.info("TCashIssueFlowResponse start")
+            logger.info("${javaClass.name} start")
             subFlow(ConfidentialIssueTokensFlowHandler(counterpartySession))
-            logger.info("TCashIssueFlowResponse finish")
+            logger.info("${javaClass.name} finish")
         }
     }
 
     companion object {
         object INITIALIZING : ProgressTracker.Step("Initializing")
-        object ISSUING_CASH_TOKEN : ProgressTracker.Step("Issuing cash token")
+        object ISSUING : ProgressTracker.Step("Issuing cash token")
     }
 }
