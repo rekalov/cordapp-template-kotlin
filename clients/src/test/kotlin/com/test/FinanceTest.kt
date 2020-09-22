@@ -32,7 +32,7 @@ class FinanceTest {
 
     private fun CordaRPCOps.printAmount(): Amount<Currency>? {
         val result = vaultQuery(Cash.State::class.java).states.map { it.state.data.amount.withoutIssuer() }
-                .takeIf { it.isNotEmpty() }?.reduce() { a, b -> a + b }
+                .takeIf { it.isNotEmpty() }?.reduce { a, b -> a + b }
         println("Node [${nodeInfo().legalIdentities.first()}] has $result.")
         return result
     }
