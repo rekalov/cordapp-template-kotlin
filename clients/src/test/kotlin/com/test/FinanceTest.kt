@@ -3,6 +3,7 @@ package com.test
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.contracts.Amount
 import net.corda.core.contracts.withoutIssuer
+import net.corda.core.crypto.toStringShort
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.startFlow
@@ -38,8 +39,16 @@ class FinanceTest {
 
     @Test
     fun check() {
-        connect("localhost:10006").printStates()
-        connect("localhost:10009").printStates()
+        connect("localhost:10006").apply {
+            printStates()
+        }
+        connect("localhost:10009").apply {
+            printStates()
+            println(networkParameters)
+            println("==============================================")
+            networkParameters.notaries.forEach { println("$it (${it.identity.owningKey.toStringShort()})") }
+            println("==============================================")
+        }
     }
 
     @Test
