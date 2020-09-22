@@ -10,6 +10,8 @@ class TestDefaults {
                 "com.test",
                 "com.template.contracts",
                 "com.template.flows",
+                "net.corda.finance.contracts",
+                "net.corda.finance.flows",
 
                 "com.r3.corda.lib.tokens.contracts",
                 "com.r3.corda.lib.tokens.workflows.flows",

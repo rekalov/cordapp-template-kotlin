@@ -11,6 +11,12 @@ sourceSets {
 dependencies {
     // Corda dependencies.
     compile "$corda_release_group:corda-rpc:$corda_release_version"
+    compile ("$corda_release_group:corda-finance-contracts:$corda_release_version"){
+        transitive = false
+    }
+    compile ("$corda_release_group:corda-finance-workflows:$corda_release_version"){
+        transitive = false
+    }
 
     // CorDapp dependencies.
     compile project(":contracts")
@@ -23,6 +29,7 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
     compile "org.slf4j:jul-to-slf4j:$slf4j_version"
+    testCompile "junit:junit:$junit_version"
 }
 
 
