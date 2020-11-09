@@ -19,9 +19,6 @@ dependencies {
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
 
-    cordapp "com.r3.corda.lib.tokens:tokens-contracts:$cordaTokenSdkVersion"
-    cordapp "com.r3.corda.lib.tokens:tokens-money:$cordaTokenSdkVersion"
-    cordaCompile ("$corda_release_group:corda-finance-contracts:$corda_release_version"){
-        transitive = false
-    }
+    testCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+    testCompile "junit:junit:$junit_version"
 }
